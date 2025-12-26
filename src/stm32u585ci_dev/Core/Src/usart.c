@@ -21,45 +21,17 @@
 #include "usart.h"
 
 /* USER CODE BEGIN 0 */
-
+#include <stdio.h>
+#include <stdint.h>
 #include <string.h>
+#include <stdbool.h>
+#include <stdarg.h>
 
 /* Simple interrupt-driven TX/RX for LPUART1 */
 #define LPUART1_RX_BUF_SIZE 256
 static volatile uint8_t lpuart1_rx_buf[LPUART1_RX_BUF_SIZE];
 static volatile uint16_t lpuart1_rx_head = 0;
 static volatile uint16_t lpuart1_rx_tail = 0;
-
-/* FIFO-aware polling TX without interrupt (burst up to 8 bytes) */
-void lpuart1_start_tx(const uint8_t *p_data, uint16_t len)
-{
-  if (len == 0 || p_data == NULL) {
-    return;
-  }
-
-  const uint8_t *ptr = p_data;
-  uint16_t sent = 0;
-
-  /* Transmit in bursts to fill the 8-byte FIFO when possible */
-  while (sent < len) {
-    /* Wait until TXE indicates FIFO has space for at least one byte */
-    while (!LL_LPUART_IsActiveFlag_TXE(LPUART1)) {
-      ;
-    }
-
-    /* Transmit one byte and then try to write up to 7 more while TXE remains set */
-    LL_LPUART_TransmitData8(LPUART1, ptr[sent++]);
-#if 0
-    /* Wait for final byte to complete transmission (TC) */
-    while (!LL_LPUART_IsActiveFlag_TC(LPUART1)) {
-      ;
-    }
-
-    /* Clear TC for next transmission */
-    LL_LPUART_ClearFlag_TC(LPUART1);
-#endif
-  }
-}
 
 int lpuart1_rx_available(void)
 {

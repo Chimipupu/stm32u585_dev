@@ -39,7 +39,6 @@ extern "C" {
 void MX_LPUART1_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-void lpuart1_start_tx(const uint8_t *data, uint16_t len);
 int lpuart1_rx_available(void);
 int lpuart1_read_rx(uint8_t *buf, int buf_len);
 void lpuart1_irq_handler(void);

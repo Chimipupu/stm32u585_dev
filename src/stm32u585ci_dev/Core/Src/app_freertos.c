@@ -22,6 +22,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
+#include <stdbool.h>
+#include <stdarg.h>
 
 #include "usart.h"
 /* USER CODE END Includes */
@@ -38,6 +43,29 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
+
+/**
+ * @brief LPUART経由でprintf()相当の出力
+ */
+void DBG_LPUART_PRINTF(const char *format, ...)
+{
+#if 1
+// #ifdef DEBUG_UART_USE
+    char buffer[256];
+    va_list args;
+    int len;
+
+    va_start(args, format);
+    len = vsnprintf(buffer, sizeof(buffer), format, args);
+    va_end(args);
+
+    for (int i = 0; i < len && i < sizeof(buffer); i++)
+    {
+        while (!LL_LPUART_IsActiveFlag_TXE(LPUART1));
+        LL_LPUART_TransmitData8(LPUART1, (uint8_t)buffer[i]);
+    }
+#endif // DEBUG_UART_USE
+}
 
 /* USER CODE END PM */
 
@@ -132,13 +160,17 @@ void StartDefaultTask(void *argument)
 void app_main_task_func(void *argument)
 {
   /* USER CODE BEGIN appMainTask */
-  const uint8_t msg[] = "AppMainTask\r\n";
+  volatile static uint32_t s_cnt = 0;
+
+  DBG_LPUART_PRINTF("AppMainTask\r\n");
+
   /* Infinite loop */
   for(;;)
   {
     // (DEBUG)基板のLEDをトグル
-    // LL_GPIO_TogglePin(OB_LED_GPIO_Port, OB_LED_Pin);
-    lpuart1_start_tx(&msg[0], sizeof(msg)-1);
+    LL_GPIO_TogglePin(OB_LED_GPIO_Port, OB_LED_Pin);
+    DBG_LPUART_PRINTF("[DEBUG] CNT = %d\r\n", s_cnt);
+    s_cnt++;
     osDelay(1000);
   }
   /* USER CODE END appMainTask */
