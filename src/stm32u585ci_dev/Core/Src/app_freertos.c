@@ -135,7 +135,10 @@ void app_main_task_func(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    // (DEBUG)基板のLEDをトグル
+    LL_GPIO_TogglePin(OB_LED_GPIO_Port, OB_LED_Pin);
+
+    osDelay(100);
   }
   /* USER CODE END appMainTask */
 }
