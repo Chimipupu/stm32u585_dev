@@ -39,12 +39,9 @@
  * See the third party link http://www.nadler.com/embedded/newlibAndFreeRTOS.html
  * for additional information. */
 
-#if __has_include(<reent.h>)
 #include <reent.h>
+
 #define configUSE_C_RUNTIME_TLS_SUPPORT    1
-#else
-#define configUSE_C_RUNTIME_TLS_SUPPORT    0
-#endif
 
 #ifndef configTLS_BLOCK_TYPE
     #define configTLS_BLOCK_TYPE           struct _reent

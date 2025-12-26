@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "usart.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -61,7 +62,6 @@ const osThreadAttr_t appMainTask_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-
 /* USER CODE END FunctionPrototypes */
 
 /**
@@ -132,19 +132,19 @@ void StartDefaultTask(void *argument)
 void app_main_task_func(void *argument)
 {
   /* USER CODE BEGIN appMainTask */
+  const uint8_t msg[] = "AppMainTask\r\n";
   /* Infinite loop */
   for(;;)
   {
     // (DEBUG)基板のLEDをトグル
-    LL_GPIO_TogglePin(OB_LED_GPIO_Port, OB_LED_Pin);
-
-    osDelay(100);
+    // LL_GPIO_TogglePin(OB_LED_GPIO_Port, OB_LED_Pin);
+    lpuart1_start_tx(&msg[0], sizeof(msg)-1);
+    osDelay(1000);
   }
   /* USER CODE END appMainTask */
 }
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
-
 /* USER CODE END Application */
 

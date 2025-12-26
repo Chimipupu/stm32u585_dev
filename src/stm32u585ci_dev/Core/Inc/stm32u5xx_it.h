@@ -56,7 +56,6 @@ void LPUART1_IRQHandler(void);
 void AES_IRQHandler(void);
 void RNG_IRQHandler(void);
 void HASH_IRQHandler(void);
-void LPDMA1_Channel0_IRQHandler(void);
 void CORDIC_IRQHandler(void);
 /* USER CODE BEGIN EFP */
 

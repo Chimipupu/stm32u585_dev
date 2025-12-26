@@ -25,7 +25,6 @@
 #include "hash.h"
 #include "i2c.h"
 #include "icache.h"
-#include "lpdma.h"
 #include "usart.h"
 #include "rng.h"
 #include "rtc.h"
@@ -102,7 +101,6 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_LPDMA1_Init();
   MX_RTC_Init();
   MX_AES_Init();
   MX_CORDIC_Init();
@@ -180,9 +178,9 @@ void SystemClock_Config(void)
   {
   }
 
-  LL_RCC_PLL1_ConfigDomain_SYS(LL_RCC_PLL1SOURCE_HSE, 1, 10, 1);
+  LL_RCC_PLL1_ConfigDomain_SYS(LL_RCC_PLL1SOURCE_HSE, 2, 12, 1);
   LL_RCC_PLL1_EnableDomain_SYS();
-  LL_RCC_SetPll1EPodPrescaler(LL_RCC_PLL1MBOOST_DIV_1);
+  LL_RCC_SetPll1EPodPrescaler(LL_RCC_PLL1MBOOST_DIV_2);
   LL_RCC_PLL1_SetVCOInputRange(LL_RCC_PLLINPUTRANGE_8_16);
   LL_RCC_PLL1_Enable();
 
@@ -208,7 +206,7 @@ void SystemClock_Config(void)
   LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_1);
   LL_RCC_SetAPB2Prescaler(LL_RCC_APB2_DIV_1);
   LL_RCC_SetAPB3Prescaler(LL_RCC_APB3_DIV_1);
-  LL_SetSystemCoreClock(160000000);
+  LL_SetSystemCoreClock(150000000);
 
    /* Update the time base */
   if (HAL_InitTick (TICK_INT_PRIORITY) != HAL_OK)

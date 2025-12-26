@@ -24,6 +24,7 @@
 #include "task.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "usart.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -59,7 +60,6 @@
 /* External variables --------------------------------------------------------*/
 extern CRYP_HandleTypeDef hcryp;
 extern HASH_HandleTypeDef hhash;
-extern LL_DMA_LinkNodeTypeDef Node_LPDMA1_Channel0;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -171,7 +171,7 @@ void LPUART1_IRQHandler(void)
 
   /* USER CODE END LPUART1_IRQn 0 */
   /* USER CODE BEGIN LPUART1_IRQn 1 */
-
+  lpuart1_irq_handler();
   /* USER CODE END LPUART1_IRQn 1 */
 }
 
@@ -214,19 +214,6 @@ void HASH_IRQHandler(void)
   /* USER CODE BEGIN HASH_IRQn 1 */
 
   /* USER CODE END HASH_IRQn 1 */
-}
-
-/**
-  * @brief This function handles LPDMA1 SmartRun Channel 0 global interrupt.
-  */
-void LPDMA1_Channel0_IRQHandler(void)
-{
-  /* USER CODE BEGIN LPDMA1_Channel0_IRQn 0 */
-
-  /* USER CODE END LPDMA1_Channel0_IRQn 0 */
-  /* USER CODE BEGIN LPDMA1_Channel0_IRQn 1 */
-
-  /* USER CODE END LPDMA1_Channel0_IRQn 1 */
 }
 
 /**

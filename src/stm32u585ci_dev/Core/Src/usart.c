@@ -22,6 +22,80 @@
 
 /* USER CODE BEGIN 0 */
 
+#include <string.h>
+
+/* Simple interrupt-driven TX/RX for LPUART1 */
+#define LPUART1_RX_BUF_SIZE 256
+static volatile uint8_t lpuart1_rx_buf[LPUART1_RX_BUF_SIZE];
+static volatile uint16_t lpuart1_rx_head = 0;
+static volatile uint16_t lpuart1_rx_tail = 0;
+
+/* FIFO-aware polling TX without interrupt (burst up to 8 bytes) */
+void lpuart1_start_tx(const uint8_t *p_data, uint16_t len)
+{
+  if (len == 0 || p_data == NULL) {
+    return;
+  }
+
+  const uint8_t *ptr = p_data;
+  uint16_t sent = 0;
+
+  /* Transmit in bursts to fill the 8-byte FIFO when possible */
+  while (sent < len) {
+    /* Wait until TXE indicates FIFO has space for at least one byte */
+    while (!LL_LPUART_IsActiveFlag_TXE(LPUART1)) {
+      ;
+    }
+
+    /* Transmit one byte and then try to write up to 7 more while TXE remains set */
+    LL_LPUART_TransmitData8(LPUART1, ptr[sent++]);
+#if 0
+    /* Wait for final byte to complete transmission (TC) */
+    while (!LL_LPUART_IsActiveFlag_TC(LPUART1)) {
+      ;
+    }
+
+    /* Clear TC for next transmission */
+    LL_LPUART_ClearFlag_TC(LPUART1);
+#endif
+  }
+}
+
+int lpuart1_rx_available(void)
+{
+  uint16_t head = lpuart1_rx_head;
+  uint16_t tail = lpuart1_rx_tail;
+  return (head >= tail) ? (head - tail) : (LPUART1_RX_BUF_SIZE - tail + head);
+}
+
+int lpuart1_read_rx(uint8_t *buf, int buf_len)
+{
+  if (buf_len <= 0) return 0;
+  int cnt = 0;
+  while (cnt < buf_len && lpuart1_rx_tail != lpuart1_rx_head) {
+    buf[cnt++] = lpuart1_rx_buf[lpuart1_rx_tail++];
+    if (lpuart1_rx_tail >= LPUART1_RX_BUF_SIZE) lpuart1_rx_tail = 0;
+  }
+  return cnt;
+}
+
+void lpuart1_irq_handler(void)
+{
+  volatile uint8_t tmp;
+
+  /* RXNE */
+  if (LL_LPUART_IsActiveFlag_RXNE(LPUART1)) {
+    tmp = (uint8_t)LL_LPUART_ReceiveData8(LPUART1);
+    /* store only ASCII alphanumeric characters */
+    if ((tmp >= '0' && tmp <= '9') || (tmp >= 'A' && tmp <= 'Z') || (tmp >= 'a' && tmp <= 'z')) {
+      uint16_t next = (lpuart1_rx_head + 1) % LPUART1_RX_BUF_SIZE;
+      if (next != lpuart1_rx_tail) {
+        lpuart1_rx_buf[lpuart1_rx_head] = tmp;
+        lpuart1_rx_head = next;
+      }
+    }
+  }
+}
 /* USER CODE END 0 */
 
 /* LPUART1 init function */
@@ -36,9 +110,6 @@ void MX_LPUART1_UART_Init(void)
   LL_LPUART_InitTypeDef LPUART_InitStruct = {0};
 
   LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
-  LL_DMA_InitNodeTypeDef nodeconfig = {0};
-  LL_DMA_LinkNodeTypeDef Node_LPDMA1_Channel0 = {0};
-  LL_DMA_InitLinkedListTypeDef DMA_InitLinkedListStruct = {0};
 
   LL_RCC_SetLPUARTClockSource(LL_RCC_LPUART1_CLKSOURCE_PCLK3);
 
@@ -57,36 +128,6 @@ void MX_LPUART1_UART_Init(void)
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
   GPIO_InitStruct.Alternate = LL_GPIO_AF_8;
   LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /* LPUART1 DMA Init */
-
-  /* LPDMA1_REQUEST_LPUART1_RX Init */
-  nodeconfig.DestIncMode = LL_DMA_DEST_FIXED;
-  nodeconfig.DestDataWidth = LL_DMA_DEST_DATAWIDTH_BYTE;
-  nodeconfig.DataAlignment = LL_DMA_DATA_ALIGN_ZEROPADD;
-  nodeconfig.SrcIncMode = LL_DMA_SRC_FIXED;
-  nodeconfig.SrcDataWidth = LL_DMA_SRC_DATAWIDTH_BYTE;
-  nodeconfig.TransferEventMode = LL_DMA_TCEM_BLK_TRANSFER;
-  nodeconfig.TriggerPolarity = LL_DMA_TRIG_POLARITY_MASKED;
-  nodeconfig.BlkHWRequest = LL_DMA_HWREQUEST_SINGLEBURST;
-  nodeconfig.Direction = LL_DMA_DIRECTION_PERIPH_TO_MEMORY;
-  nodeconfig.Request = LL_LPDMA1_REQUEST_LPUART1_RX;
-  nodeconfig.UpdateRegisters = (LL_DMA_UPDATE_CTR1 | LL_DMA_UPDATE_CTR2 | LL_DMA_UPDATE_CBR1 | LL_DMA_UPDATE_CSAR | LL_DMA_UPDATE_CDAR | LL_DMA_UPDATE_CTR3 | LL_DMA_UPDATE_CBR2 | LL_DMA_UPDATE_CLLR);
-  nodeconfig.NodeType = LL_DMA_LPDMA_LINEAR_NODE;
-  LL_DMA_CreateLinkNode(&nodeconfig, &Node_LPDMA1_Channel0);
-
-  LL_DMA_ConnectLinkNode(&Node_LPDMA1_Channel0, LL_DMA_CLLR_OFFSET5, &Node_LPDMA1_Channel0, LL_DMA_CLLR_OFFSET5);
-
-  /* Next function call is commented because it will not compile as is. The Node structure address has to be cast to an unsigned int (uint32_t)pNode_DMAxCHy */
-  /*
-
-  */
-  LL_DMA_SetLinkedListBaseAddr(LPDMA1, LL_DMA_CHANNEL_0, (uint32_t)&Node_LPDMA1_Channel0);
-
-  DMA_InitLinkedListStruct.Priority = LL_DMA_LOW_PRIORITY_LOW_WEIGHT;
-  DMA_InitLinkedListStruct.LinkStepMode = LL_DMA_LSM_FULL_EXECUTION;
-  DMA_InitLinkedListStruct.TransferEventMode = LL_DMA_TCEM_BLK_TRANSFER;
-  LL_DMA_List_Init(LPDMA1, LL_DMA_CHANNEL_0, &DMA_InitLinkedListStruct);
 
   /* LPUART1 interrupt Init */
   NVIC_SetPriority(LPUART1_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),5, 0));
@@ -108,7 +149,8 @@ void MX_LPUART1_UART_Init(void)
   LL_LPUART_DisableFIFO(LPUART1);
   LL_LPUART_Enable(LPUART1);
   /* USER CODE BEGIN LPUART1_Init 2 */
-
+  LL_LPUART_EnableIT_RXNE(LPUART1);
+  // LL_LPUART_EnableIT_TXE(LPUART1);
   /* USER CODE END LPUART1_Init 2 */
 
 }
