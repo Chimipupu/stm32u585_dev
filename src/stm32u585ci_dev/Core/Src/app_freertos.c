@@ -83,7 +83,7 @@ osThreadId_t dbgCmdTaskHandle;
 const osThreadAttr_t dbgCmdTask_attributes = {
   .name = "dbgCmdTask",
   .priority = (osPriority_t) osPriorityAboveNormal,
-  .stack_size = 1024 * 4
+  .stack_size = 256 * 4
 };
 
 /* USER CODE END Variables */
@@ -99,7 +99,7 @@ osThreadId_t appMainTaskHandle;
 const osThreadAttr_t appMainTask_attributes = {
   .name = "appMainTask",
   .priority = (osPriority_t) osPriorityHigh,
-  .stack_size = 1024 * 4
+  .stack_size = 512 * 4
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -113,7 +113,21 @@ const osThreadAttr_t appMainTask_attributes = {
   */
 void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
+  appMainTaskHandle = osThreadNew(AppMainTask, NULL, &appMainTask_attributes);
+  if (appMainTaskHandle == NULL) {
+    DBG_LPUART_PRINTF("ERR: appMainTask create failed\r\n");
+  } else {
+    DBG_LPUART_PRINTF("OK: appMainTask created\r\n");
+  }
+
   dbgCmdTaskHandle = osThreadNew(DBGCmdTask, NULL, &dbgCmdTask_attributes);
+  if (dbgCmdTaskHandle == NULL) {
+    DBG_LPUART_PRINTF("ERR: dbgCmdTask create failed\r\n");
+  } else {
+    DBG_LPUART_PRINTF("OK: dbgCmdTask created\r\n");
+  }
+
+  // defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
   /* USER CODE END Init */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -131,11 +145,6 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
-  /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
-
-  /* creation of appMainTask */
-  appMainTaskHandle = osThreadNew(AppMainTask, NULL, &appMainTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -212,7 +221,7 @@ void DBGCmdTask(void *argument)
       DBG_LPUART_PRINTF("[DEBUG] Cmd: %s\r\n", cmd_buf);
       memset(&cmd_buf[0], 0x00, sizeof(cmd_buf));
     }
-    osDelay(300);
+    osDelay(200);
   }
 }
 /* USER CODE END Application */
