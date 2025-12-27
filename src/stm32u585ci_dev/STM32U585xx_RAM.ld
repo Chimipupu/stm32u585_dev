@@ -41,6 +41,7 @@ MEMORY
 {
   RAM	(xrw)	: ORIGIN = 0x20000000,	LENGTH = 768K
   SRAM4	(xrw)	: ORIGIN = 0x28000000,	LENGTH = 16K
+  BK_SRAM (xrw) : ORIGIN = 0x40036400,  LENGTH = 2K
 }
 /* Highest address of the user mode stack */
 _estack = ORIGIN(RAM) + LENGTH(RAM);	/* end of "RAM" Ram type memory */
@@ -211,6 +212,15 @@ SECTIONS
 
   PROVIDE( __bss_start = __tbss_start );
   PROVIDE( __bss_size = __bss_end - __bss_start );
+
+
+  /* Backup SRAM section */
+  .bk_sram (NOLOAD) :
+  {
+    . = ALIGN(4);
+    *(.bk_sram)
+    . = ALIGN(4);
+  } >BK_SRAM
 
 
   /* User_heap_stack section, used to check that there is enough "RAM" Ram  type memory left */

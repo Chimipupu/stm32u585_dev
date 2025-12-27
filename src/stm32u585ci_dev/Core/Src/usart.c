@@ -27,45 +27,70 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
+/**
+ * @brief コマンド受信フラグ(UART)
+ */
+volatile static bool s_rx_uart_cmd_flg = false;
+
 /* Simple interrupt-driven TX/RX for LPUART1 */
-#define LPUART1_RX_BUF_SIZE 256
-static volatile uint8_t lpuart1_rx_buf[LPUART1_RX_BUF_SIZE];
-static volatile uint16_t lpuart1_rx_head = 0;
-static volatile uint16_t lpuart1_rx_tail = 0;
+#define LPUART_RX_BUF_SIZE    256
+static volatile uint8_t s_lpuart_rx_buf[LPUART_RX_BUF_SIZE];
+static uint8_t s_rx_buf_idx = 0;
 
-int lpuart1_rx_available(void)
+/**
+ * @brief デバッグコマンド受信確認
+ * @param[out] p_cmd_buf コマンド受信バッファポインタ
+ * @return true デバッグコマンド受信完了
+ * @return false デバッグコマンド受信無し
+ */
+bool dbg_cmd_ready(uint8_t *p_cmd_buf)
 {
-  uint16_t head = lpuart1_rx_head;
-  uint16_t tail = lpuart1_rx_tail;
-  return (head >= tail) ? (head - tail) : (LPUART1_RX_BUF_SIZE - tail + head);
-}
+  bool ret = false;
+  uint8_t i;
+  uint8_t *p_ptr = p_cmd_buf;
 
-int lpuart1_read_rx(uint8_t *buf, int buf_len)
-{
-  if (buf_len <= 0) return 0;
-  int cnt = 0;
-  while (cnt < buf_len && lpuart1_rx_tail != lpuart1_rx_head) {
-    buf[cnt++] = lpuart1_rx_buf[lpuart1_rx_tail++];
-    if (lpuart1_rx_tail >= LPUART1_RX_BUF_SIZE) lpuart1_rx_tail = 0;
+  // NOTE: コマンドを渡す(将来的にはDMAにさせたい)
+  if(s_rx_uart_cmd_flg != false) {
+    for(i = 0; i < s_rx_buf_idx; i++)
+    {
+      *p_ptr = s_lpuart_rx_buf[i];
+      p_ptr++;
+    }
+
+    ret = true;
+
+    // 変数初期化
+    memset((void *)&s_lpuart_rx_buf[0], 0x00, LPUART_RX_BUF_SIZE);
+    s_rx_buf_idx = 0;
+    s_rx_uart_cmd_flg = false;
   }
-  return cnt;
+
+  return ret;
 }
 
+/**
+ * @brief LPUART割り込みハンドラ
+ * 
+ */
 void lpuart1_irq_handler(void)
 {
   volatile uint8_t tmp;
 
   /* RXNE */
   if (LL_LPUART_IsActiveFlag_RXNE(LPUART1)) {
-    tmp = (uint8_t)LL_LPUART_ReceiveData8(LPUART1);
-    /* store only ASCII alphanumeric characters */
-    if ((tmp >= '0' && tmp <= '9') || (tmp >= 'A' && tmp <= 'Z') || (tmp >= 'a' && tmp <= 'z')) {
-      uint16_t next = (lpuart1_rx_head + 1) % LPUART1_RX_BUF_SIZE;
-      if (next != lpuart1_rx_tail) {
-        lpuart1_rx_buf[lpuart1_rx_head] = tmp;
-        lpuart1_rx_head = next;
+      tmp = (uint8_t)LL_LPUART_ReceiveData8(LPUART1);
+
+      // ASCIIの文字か特定の文字だけバッファで受け取る
+      if ((tmp >= '0' && tmp <= '9') ||
+          (tmp >= 'A' && tmp <= 'Z') || (tmp >= 'a' && tmp <= 'z') ||
+          (tmp == '!') || (tmp == '?'))
+      {
+        s_lpuart_rx_buf[s_rx_buf_idx] = tmp;
+        s_rx_buf_idx = (s_rx_buf_idx + 1) % LPUART_RX_BUF_SIZE;
+      // コマンド受信 = デリミタ
+      } else if ((s_rx_buf_idx > 0) && (tmp == '\r' || tmp == '\n')) {
+          s_rx_uart_cmd_flg = true;
       }
-    }
   }
 }
 /* USER CODE END 0 */

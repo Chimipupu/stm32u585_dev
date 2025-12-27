@@ -63,7 +63,7 @@ extern osThreadId_t appMainTaskHandle;
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
-void app_main_task_func(void *argument);
+void AppMainTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 

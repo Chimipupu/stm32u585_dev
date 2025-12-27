@@ -29,7 +29,7 @@ extern "C" {
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-
+#include <stdbool.h>
 /* USER CODE END Includes */
 
 /* USER CODE BEGIN Private defines */
@@ -39,6 +39,7 @@ extern "C" {
 void MX_LPUART1_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
+bool dbg_cmd_ready(uint8_t *p_cmd_buf);
 int lpuart1_rx_available(void);
 int lpuart1_read_rx(uint8_t *buf, int buf_len);
 void lpuart1_irq_handler(void);

@@ -52,7 +52,7 @@ void MX_GPIO_Init(void)
   LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOB);
 
   /**/
-  LL_GPIO_ResetOutputPin(OB_LED_GPIO_Port, OB_LED_Pin);
+  LL_GPIO_SetOutputPin(OB_LED_GPIO_Port, OB_LED_Pin);
 
   /**/
   GPIO_InitStruct.Pin = OB_LED_Pin;

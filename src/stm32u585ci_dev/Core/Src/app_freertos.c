@@ -38,7 +38,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+void DBGCmdTask(void *argument);
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -72,6 +72,20 @@ void DBG_LPUART_PRINTF(const char *format, ...)
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 
+/**
+ * @brief Bootカウント @バックアップSRAMに配置
+ * @note BK_SRAMセクションに配置 (BK_SRAM (xrw) : ORIGIN = 0x40036400,  LENGTH = 2K)
+ * @note BK_SRAMはVBATで保持できる2KBのSRAM
+ */
+volatile uint32_t g_bk_sram_boot_cnt __attribute__((section(".bk_sram"))) = 0;
+
+osThreadId_t dbgCmdTaskHandle;
+const osThreadAttr_t dbgCmdTask_attributes = {
+  .name = "dbgCmdTask",
+  .priority = (osPriority_t) osPriorityAboveNormal,
+  .stack_size = 1024 * 4
+};
+
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -99,7 +113,7 @@ const osThreadAttr_t appMainTask_attributes = {
   */
 void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
-
+  dbgCmdTaskHandle = osThreadNew(DBGCmdTask, NULL, &dbgCmdTask_attributes);
   /* USER CODE END Init */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -121,7 +135,7 @@ void MX_FREERTOS_Init(void) {
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
   /* creation of appMainTask */
-  appMainTaskHandle = osThreadNew(app_main_task_func, NULL, &appMainTask_attributes);
+  appMainTaskHandle = osThreadNew(AppMainTask, NULL, &appMainTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -145,22 +159,25 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    osDelay(1000);
   }
   /* USER CODE END defaultTask */
 }
 
-/* USER CODE BEGIN Header_app_main_task_func */
+/* USER CODE BEGIN Header_AppMainTask */
 /**
 * @brief Function implementing the appMainTask thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_app_main_task_func */
-void app_main_task_func(void *argument)
+/* USER CODE END Header_AppMainTask */
+void AppMainTask(void *argument)
 {
   /* USER CODE BEGIN appMainTask */
-  volatile static uint32_t s_cnt = 0;
+
+  // バックアップSRAMのBootカウントをインクリメント
+  DBG_LPUART_PRINTF("[DEBUG] Boot Cnt = %d\r\n", g_bk_sram_boot_cnt);
+  g_bk_sram_boot_cnt++;
 
   DBG_LPUART_PRINTF("AppMainTask\r\n");
 
@@ -169,14 +186,34 @@ void app_main_task_func(void *argument)
   {
     // (DEBUG)基板のLEDをトグル
     LL_GPIO_TogglePin(OB_LED_GPIO_Port, OB_LED_Pin);
-    DBG_LPUART_PRINTF("[DEBUG] CNT = %d\r\n", s_cnt);
-    s_cnt++;
-    osDelay(1000);
+    osDelay(100);
   }
   /* USER CODE END appMainTask */
 }
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+/**
+ * @brief デバッグコマンドタスク
+ * 
+ * @param argument 未使用
+ */
+void DBGCmdTask(void *argument)
+{
+  bool ret;
+  uint8_t cmd_buf[64] = {0};
+
+  DBG_LPUART_PRINTF("DBGCmdTask\r\n");
+
+  for(;;)
+  {
+    ret = dbg_cmd_ready(cmd_buf);
+    if (ret != false) {
+      DBG_LPUART_PRINTF("[DEBUG] Cmd: %s\r\n", cmd_buf);
+      memset(&cmd_buf[0], 0x00, sizeof(cmd_buf));
+    }
+    osDelay(300);
+  }
+}
 /* USER CODE END Application */
 
