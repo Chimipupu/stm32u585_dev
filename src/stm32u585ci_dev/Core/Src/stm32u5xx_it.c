@@ -24,6 +24,7 @@
 #include "task.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "app_main.h"
 #include "usart.h"
 /* USER CODE END Includes */
 
@@ -196,7 +197,9 @@ void SPI1_IRQHandler(void)
 void LPUART1_IRQHandler(void)
 {
   /* USER CODE BEGIN LPUART1_IRQn 0 */
+
   lpuart1_irq_handler();
+
   /* USER CODE END LPUART1_IRQn 0 */
   /* USER CODE BEGIN LPUART1_IRQn 1 */
 

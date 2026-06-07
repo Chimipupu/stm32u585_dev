@@ -44,7 +44,6 @@ extern "C" {
 #include "stm32u5xx_ll_utils.h"
 #include "stm32u5xx_ll_dma.h"
 #include "stm32u5xx_ll_rng.h"
-#include "stm32u5xx_ll_rtc.h"
 #include "stm32u5xx_ll_gpio.h"
 #include "stm32u5xx_ll_lpgpio.h"
 
