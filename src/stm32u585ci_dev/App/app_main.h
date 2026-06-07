@@ -37,22 +37,11 @@
 
 // --------------------------------------------------------------------------
 // [コンパイルスイッチ]
-#define DBG_APP
+// #define DBG_APP
 
 // --------------------------------------------------------------------------
 // [Define]
-#ifndef KEY_Pin
-#define KEY_Pin GPIO_PIN_13
-#endif
-#ifndef KEY_GPIO_Port
-#define KEY_GPIO_Port GPIOC
-#endif
-#ifndef LED_Pin
-#define LED_Pin GPIO_PIN_2
-#endif
-#ifndef LED_GPIO_Port
-#define LED_GPIO_Port GPIOB
-#endif
+
 // --------------------------------------------------------------------------
 // [FreeRTOS関連]
 extern osThreadId_t AppMainTaskHandle;
