@@ -28,6 +28,7 @@
 #include "usart.h"
 #include "rng.h"
 #include "rtc.h"
+#include "spi.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -110,6 +111,7 @@ int main(void)
   MX_CRC_Init();
   MX_I2C1_Init();
   MX_ICACHE_Init();
+  MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */

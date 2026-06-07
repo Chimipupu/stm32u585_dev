@@ -99,10 +99,10 @@ void MX_RTC_Init(void)
   RTC_TimeStruct.Seconds = 0x0;
 
   LL_RTC_TIME_Init(RTC, LL_RTC_FORMAT_BCD, &RTC_TimeStruct);
-  RTC_DateStruct.WeekDay = LL_RTC_WEEKDAY_MONDAY;
-  RTC_DateStruct.Month = LL_RTC_MONTH_JANUARY;
+  RTC_DateStruct.WeekDay = LL_RTC_WEEKDAY_WEDNESDAY;
+  RTC_DateStruct.Month = LL_RTC_MONTH_JULY;
   RTC_DateStruct.Day = 0x1;
-  RTC_DateStruct.Year = 0x0;
+  RTC_DateStruct.Year = 0x26;
 
   LL_RTC_DATE_Init(RTC, LL_RTC_FORMAT_BCD, &RTC_DateStruct);
   /* USER CODE BEGIN RTC_Init 2 */
@@ -114,3 +114,4 @@ void MX_RTC_Init(void)
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
+

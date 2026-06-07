@@ -1,13 +1,13 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    icache.c
-  * @brief   This file provides code for the configuration
-  *          of the ICACHE instances.
+  * @file    spi.h
+  * @brief   This file contains all the function prototypes for
+  *          the spi.c file
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2025 STMicroelectronics.
+  * Copyright (c) 2026 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -17,31 +17,36 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __SPI_H__
+#define __SPI_H__
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Includes ------------------------------------------------------------------*/
-#include "icache.h"
+#include "main.h"
 
-/* USER CODE BEGIN 0 */
+/* USER CODE BEGIN Includes */
 
-/* USER CODE END 0 */
+/* USER CODE END Includes */
 
-/* ICACHE init function */
-void MX_ICACHE_Init(void)
-{
+extern SPI_HandleTypeDef hspi1;
 
-  /* USER CODE BEGIN ICACHE_Init 0 */
+/* USER CODE BEGIN Private defines */
 
-  /* USER CODE END ICACHE_Init 0 */
+/* USER CODE END Private defines */
 
-  /* USER CODE BEGIN ICACHE_Init 1 */
+void MX_SPI1_Init(void);
 
-  /* USER CODE END ICACHE_Init 1 */
-  /* USER CODE BEGIN ICACHE_Init 2 */
+/* USER CODE BEGIN Prototypes */
 
-  /* USER CODE END ICACHE_Init 2 */
+/* USER CODE END Prototypes */
 
+#ifdef __cplusplus
 }
+#endif
 
-/* USER CODE BEGIN 1 */
-
-/* USER CODE END 1 */
+#endif /* __SPI_H__ */
 

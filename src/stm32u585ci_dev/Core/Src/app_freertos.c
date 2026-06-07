@@ -99,7 +99,7 @@ osThreadId_t appMainTaskHandle;
 const osThreadAttr_t appMainTask_attributes = {
   .name = "appMainTask",
   .priority = (osPriority_t) osPriorityHigh,
-  .stack_size = 512 * 4
+  .stack_size = 1024 * 4
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -145,6 +145,11 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
+  /* creation of defaultTask */
+  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+
+  /* creation of appMainTask */
+  appMainTaskHandle = osThreadNew(AppMainTask, NULL, &appMainTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -221,7 +226,7 @@ void DBGCmdTask(void *argument)
       DBG_LPUART_PRINTF("[DEBUG] Cmd: %s\r\n", cmd_buf);
       memset(&cmd_buf[0], 0x00, sizeof(cmd_buf));
     }
-    osDelay(200);
+    osDelay(300);
   }
 }
 /* USER CODE END Application */
