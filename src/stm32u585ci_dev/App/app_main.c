@@ -1,7 +1,7 @@
 /**
- * @file app_main.h
+ * @file app_main.c
  * @author Chimipupu(https://github.com/Chimipupu)
- * @brief アプリメインのヘッダ
+ * @brief アプリメイン (for STM32U585CIU6)
  * @version 0.1
  * @date 2026-06-07
  * @copyright Copyright (c) 2026 Chimipupu All Rights Reserved.
@@ -189,7 +189,7 @@ void lpuart1_irq_handler(void)
 
 void app_main_init(void)
 {
-    DBG_LPUART_PRINTF("STM32H562VGT6 Develop by Chimipupu\r\n");
+    DBG_LPUART_PRINTF("STM32U585CIU6 Develop by Chimipupu\r\n");
 
     // アプリのメイン用のFreeRTOSタスクを生成
     AppMainTaskHandle = osThreadNew(_AppMainTask, NULL, &AppMainTask_Attr);
