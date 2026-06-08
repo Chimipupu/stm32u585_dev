@@ -38,6 +38,7 @@ static void _DbgCmdTask(void *p_args);
 
 // --------------------------------------------------------------------------
 // [バックアップSRAM @2KB]
+// NOTE: STM32U585にはバックアップSRAMの「BKPSRAM」が 2KB ある
 
 // Bootカウント
 volatile uint32_t g_bk_sram_boot_cnt __attribute__((section(".bk_sram"))) = 0;
@@ -45,19 +46,18 @@ volatile uint32_t g_bk_sram_boot_cnt __attribute__((section(".bk_sram"))) = 0;
 // --------------------------------------------------------------------------
 volatile static bool s_rx_uart_cmd_flg = false;
 
-/* Simple interrupt-driven TX/RX for LPUART1 */
 #define LPUART_RX_BUF_SIZE    256
 static volatile uint8_t s_lpuart_rx_buf[LPUART_RX_BUF_SIZE];
 static uint8_t s_rx_buf_idx = 0;
 
-static void _rtc_update(void);
 
 #ifdef DBG_APP
-
+static void _rtc_update(void);
 #endif // DBG_APP
 // --------------------------------------------------------------------------
 // [Static]
 
+#ifdef DBG_APP
 static void _rtc_update(void)
 {
     RTC_DateTypeDef sdatestructureget;
@@ -73,9 +73,6 @@ static void _rtc_update(void)
                 stimestructureget.Hours,stimestructureget.Minutes,stimestructureget.Seconds);
     }
 }
-
-#ifdef DBG_APP
-
 #endif // DBG_APP
 
 static void _AppMainTask(void *p_args)
@@ -88,8 +85,11 @@ static void _AppMainTask(void *p_args)
 
     while (1)
     {
+#ifdef DBG_APP
         HAL_GPIO_TogglePin(PCB_LED_PORT, PCB_LED_PIN);
         _rtc_update(); // RTC更新
+#endif // DBG_APP
+
         osDelay(100);
     }
 }

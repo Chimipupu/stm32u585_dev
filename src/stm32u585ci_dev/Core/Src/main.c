@@ -22,6 +22,7 @@
 #include "aes.h"
 #include "cordic.h"
 #include "crc.h"
+#include "dcache.h"
 #include "hash.h"
 #include "i2c.h"
 #include "icache.h"
@@ -59,6 +60,7 @@
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+static void SystemPower_Config(void);
 void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
 
@@ -93,6 +95,9 @@ int main(void)
 
   /* USER CODE END Init */
 
+  /* Configure the System Power */
+  SystemPower_Config();
+
   /* Configure the system clock */
   SystemClock_Config();
 
@@ -112,6 +117,7 @@ int main(void)
   MX_I2C1_Init();
   MX_ICACHE_Init();
   MX_SPI1_Init();
+  MX_DCACHE1_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -215,6 +221,22 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief Power Configuration
+  * @retval None
+  */
+static void SystemPower_Config(void)
+{
+
+  /*
+   * SRAMx Power Down In Stop Mode Config
+   */
+  LL_PWR_SetICacheRAMStopRetention(LL_PWR_ICACHERAM_STOP_FULL_RETENTION);
+  LL_PWR_SetDCache1RAMStopRetention(LL_PWR_DCACHE1RAM_STOP_FULL_RETENTION);
+/* USER CODE BEGIN PWR */
+/* USER CODE END PWR */
 }
 
 /* USER CODE BEGIN 4 */
