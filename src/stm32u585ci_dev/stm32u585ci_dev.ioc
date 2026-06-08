@@ -368,4 +368,3 @@ VP_SYS_VS_Systick.Signal=SYS_VS_Systick
 board=custom
 rtos.0.ip=STMicroelectronics.X-CUBE-FREERTOS.1.4.0
 rtos.0.tasks.0=allocationType,Dynamic;bufferName,NULL;codeGen,Default;controlBlockName,NULL;entry,StartDefaultTask;name,defaultTask;parameter,NULL;priority,osPriorityNormal;stackSize,128
-rtos.0.tasks.1=allocationType,Dynamic;bufferName,NULL;codeGen,Default;controlBlockName,NULL;entry,AppMainTask;name,appMainTask;parameter,NULL;priority,osPriorityHigh;stackSize,1024
