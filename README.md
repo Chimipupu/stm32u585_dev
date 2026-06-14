@@ -29,8 +29,8 @@
 
 ```shell
 [build] Memory region         Used Size  Region Size  %age Used
-[build]              RAM:       13800 B       768 KB      1.75%
-[build]              ROM:       34408 B         2 MB      1.64%
+[build]              RAM:       13784 B       768 KB      1.75%
+[build]              ROM:       34752 B         2 MB      1.66%
 [build]            SRAM4:          0 GB        16 KB      0.00%
 [build]          BK_SRAM:           4 B         2 KB      0.20%
 ```

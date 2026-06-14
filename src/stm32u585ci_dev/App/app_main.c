@@ -65,7 +65,7 @@ static void _AppMainTask(void *p_args)
 
 static void _DbgCmdTask(void *p_args)
 {
-    app_uart_cmd_init(NULL);
+    app_uart_cmd_init();
 
     DBG_LPUART_PRINTF("[DbgCmdTask]: Init\r\n");
 
