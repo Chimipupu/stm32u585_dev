@@ -37,7 +37,7 @@
 
 // --------------------------------------------------------------------------
 // [コンパイルスイッチ]
-// #define PRINT_RTC_UPDATE
+#define PRINT_RTC_UPDATE
 
 // --------------------------------------------------------------------------
 // [Define]
@@ -49,6 +49,10 @@ extern const osThreadAttr_t AppMainTask_Attr;
 // --------------------------------------------------------------------------
 void DBG_LPUART_PRINTF(const char *format, ...);
 void app_main_init(void);
+
+#ifdef PRINT_RTC_UPDATE
+void app_rtc_update(void);
+#endif // PRINT_RTC_UPDATE
 // --------------------------------------------------------------------------
 
 #endif // APP_MAIN_H

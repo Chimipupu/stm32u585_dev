@@ -24,9 +24,14 @@ static volatile uint8_t s_uart_cmd_rx_buf[UART_CMD_RX_BUF_SIZE];
 static bool s_rx_uart_cmd_flg = false;
 
 E_APP_UART_CMD_RESULT _cmd_help(void *p_args);
+E_APP_UART_CMD_RESULT _cmd_rtc(void *p_args);
+
 // 基本コマンド
 static const app_uart_cmd_tbl_t s_basic_cmd_tbl[] = {
     {"help", "?", _cmd_help},
+#ifdef PRINT_RTC_UPDATE
+    {"rtc", NULL, _cmd_rtc},
+#endif // PRINT_RTC_UPDATE
 };
 static const uint8_t BASIC_CMD_NUM = sizeof(s_basic_cmd_tbl) / sizeof(s_basic_cmd_tbl[0]);
 
@@ -111,6 +116,14 @@ E_APP_UART_CMD_RESULT _cmd_help(void *p_args)
     return CMD_RESULT_EXEC_OK;
 }
 
+#ifdef PRINT_RTC_UPDATE
+E_APP_UART_CMD_RESULT _cmd_rtc(void *p_args)
+{
+    app_rtc_update();
+
+    return CMD_RESULT_EXEC_OK;
+}
+#endif // PRINT_RTC_UPDATE
 // --------------------------------------------------------------------------
 // [APP]
 

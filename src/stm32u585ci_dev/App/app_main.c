@@ -44,29 +44,9 @@ static void _DbgCmdTask(void *p_args);
 uint32_t g_bkram_boot_cnt __attribute__((section(".bk_sram"))) = 0;
 
 // --------------------------------------------------------------------------
-// static void _rtc_update(void);
 
 // --------------------------------------------------------------------------
 // [Static]
-#if 0
-static void _rtc_update(void)
-{
-    RTC_DateTypeDef sdatestructureget;
-    RTC_TimeTypeDef stimestructureget;
-    static uint8_t s_prev_seconds;
-
-    HAL_RTC_GetTime(&hrtc, &stimestructureget, RTC_FORMAT_BIN);
-    HAL_RTC_GetDate(&hrtc, &sdatestructureget, RTC_FORMAT_BIN);
-    if(s_prev_seconds != stimestructureget.Seconds) {
-        s_prev_seconds  = stimestructureget.Seconds;
-#ifdef PRINT_RTC_UPDATE
-        DBG_LPUART_PRINTF("RTC: 20%02d/%02d/%02d %02d:%02d:%02d\r\n",
-                sdatestructureget.Year,sdatestructureget.Month,sdatestructureget.Date, \
-                stimestructureget.Hours,stimestructureget.Minutes,stimestructureget.Seconds);
-#endif // PRINT_RTC_UPDATE
-    }
-}
-#endif
 
 static void _AppMainTask(void *p_args)
 {
@@ -79,7 +59,6 @@ static void _AppMainTask(void *p_args)
     while (1)
     {
         HAL_GPIO_TogglePin(PCB_LED_PORT, PCB_LED_PIN);
-        // _rtc_update(); // RTC更新
         osDelay(10);
     }
 }
@@ -99,6 +78,24 @@ static void _DbgCmdTask(void *p_args)
 
 // --------------------------------------------------------------------------
 // [App]
+
+#ifdef PRINT_RTC_UPDATE
+void app_rtc_update(void)
+{
+    RTC_DateTypeDef sdatestructureget;
+    RTC_TimeTypeDef stimestructureget;
+    static uint8_t s_prev_seconds;
+
+    HAL_RTC_GetTime(&hrtc, &stimestructureget, RTC_FORMAT_BIN);
+    HAL_RTC_GetDate(&hrtc, &sdatestructureget, RTC_FORMAT_BIN);
+    if(s_prev_seconds != stimestructureget.Seconds) {
+        s_prev_seconds  = stimestructureget.Seconds;
+        DBG_LPUART_PRINTF("RTC: 20%02d/%02d/%02d %02d:%02d:%02d\r\n",
+                sdatestructureget.Year,sdatestructureget.Month,sdatestructureget.Date, \
+                stimestructureget.Hours,stimestructureget.Minutes,stimestructureget.Seconds);
+    }
+}
+#endif // PRINT_RTC_UPDATE
 
 /**
  * @brief LPUART経由でprintf()相当の出力
