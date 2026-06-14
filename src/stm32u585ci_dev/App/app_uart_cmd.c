@@ -95,9 +95,9 @@ bool _cmd_ready(uint8_t *p_cmd_buf)
         p_tbl++;
     }
 
-    // 知らんコマンドなので「?」を返す
+    // 知らんコマンドなので「What?」を返す
     if(ret == false) {
-        DBG_LPUART_PRINTF("?\r\n");
+        DBG_LPUART_PRINTF("What?\r\n");
     }
 
     // 変数初期化
