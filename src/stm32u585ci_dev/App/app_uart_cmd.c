@@ -115,7 +115,7 @@ E_APP_UART_CMD_RESULT _cmd_help(void *p_args)
 
     DBG_LPUART_PRINTF("Help CMD Exec\r\n");
 
-    DBG_LPUART_PRINTF("CMD List: NO, Cmd, Short Cmd\r\n");
+    DBG_LPUART_PRINTF("CMD List(%d): NO, Cmd, Short Cmd\r\n", CMD_TBL_NUM);
     for(i = 0; i < CMD_TBL_NUM; i++)
     {
         DBG_LPUART_PRINTF("%d, %s, %s\r\n", i, g_cmd_tbl[i].p_cmd_str, g_cmd_tbl[i].p_cmd_str_short);
